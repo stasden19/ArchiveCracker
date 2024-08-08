@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ArhicveCracker</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+<body>
+{#    <h1>{{ filename }}</h1>#}
+
+    <h1>Ща наколдую</h1>
+    <div id="status"></div>
+
+    <script>
+        function checkStatus() {
+            $.ajax({
+                type: 'GET',
+                url: '/task_status',
+                success: function(data) {
+                    if (data.status === "running") {
+                        console.log('Прогон')
+                        $('#status').html('Задача выполняется...');
+                        setTimeout(checkStatus, 5000);
+                    } else {
+                        $('#status').html('Задача выполнена. <br> Пароль: ' + data.result);
+                    }
+                }
+            });
+        }
+        checkStatus()
+    </script>
+    <form action="/" target="_blank">
+   <button>На главную</button>
+  </form>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet"
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>Загрузка файла</h1>
+    <form method="POST"
+          action="/upload"
+          id="dropper"
+          class="dropzone"
+          enctype="multipart/form-data">
+    </form>
+
+    <script type="application/javascript">
+        Dropzone.options.dropper = {
+            paramName: "file",
+            method:'put',
+            clickable: true,
+            chunking: true,
+            forceChunking: true,
+            url: "/upload",
+            maxFilesize: 1025, // megabytes
+            chunkSize: 1000000, // bytes
+            success: function (file, response) {
+                if (response.redirect) {
+                    window.location.href = response.redirect;
+                }
+            },
+        }
+    </script>
+</body>
+</html>
