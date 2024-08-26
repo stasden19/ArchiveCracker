@@ -25,8 +25,12 @@ def result(filename1):
             resulted = zip7(f'./static/files/{filename}', passlist='passlist.txt')
         elif os.path.splitext(filename1)[-1] == '.rar':
             resulted = rar(f'./static/files/{filename}', passlist='passlist.txt')
-        resulted = re.findall(r'\n(.*?) \n', resulted)[0] if resulted else 'Не тот формат файла'
-
+        try:
+            resulted = re.findall(r'\n(.*?) \n', resulted)[0] if resulted else 'Не тот формат файла'
+        except:
+            resulted = 'Пароль не найден.'
+        # resulted = re.findall(r'\n(.*?) \n', resulted)if resulted else 'Не тот формат файла'
+        print(resulted)
         os.system(f'rm ./static/files/{filename}')
         os.system(f'rm ./static/hashes/{filename.split(".")[0]}.hashes')
         # записываем результат в файл
@@ -48,7 +52,6 @@ def task_status():
         return jsonify({"status": "running"})
     else:
         return jsonify({"status": "done", "result": resulted})
-
 
 
 @app.route('/', methods=['GET', 'POST'])
