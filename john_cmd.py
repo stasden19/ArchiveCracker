@@ -1,8 +1,11 @@
+import hashlib
+import sqlite3
 import subprocess
 import os
 
 
 # Первая команда: ./7z2john.pl 4.7z > 4.hashes
+
 def zip7(archive_path, passlist='passlist.txt'):
     try:
         # os.system('rm 4.hashes')
@@ -15,8 +18,18 @@ def zip7(archive_path, passlist='passlist.txt'):
     with open(f'static/hashes/{os.path.splitext(archive_path)[0].split('/')[-1]}.hashes', "w") as f:
         subprocess.run(command1, stdout=f)
     with open(f'static/hashes/{os.path.splitext(archive_path)[0].split('/')[-1]}.hashes', "r") as f:
-        if len(f.read()) < 10:
+        hashe = f.read()
+        if len(hashe) < 10:
             return 'No hash'
+        else:
+            conn = sqlite3.connect('./static/passwords.db')
+            cur = conn.cursor()
+            res = cur.execute(f'SELECT password FROM passwords WHERE hash = "{hashlib.sha3_256(hashe.split(":")[1].encode()).hexdigest()}"')
+            res = res.fetchall()
+            if len(res):
+                cur.close()
+                conn.close()
+                return res[0][0]
     # Вторая команда: ./john --wordlist=passlist.txt 4.hashes
     command2 = ["./john/run/john", f"--wordlist={passlist}",
                 f'static/hashes/{os.path.splitext(archive_path)[0].split('/')[-1]}.hashes']
@@ -35,8 +48,19 @@ def rar(archive_path, passlist='passlist.txt'):
     with open(f'static/hashes/{os.path.splitext(archive_path)[0].split('/')[-1]}.hashes', "w") as f:
         subprocess.run(command1, stdout=f)
     with open(f'static/hashes/{os.path.splitext(archive_path)[0].split('/')[-1]}.hashes', "r") as f:
-        if len(f.read()) < 10:
+        hashe = f.read()
+        if len(hashe) < 10:
             return 'No hash'
+        else:
+            conn = sqlite3.connect('./static/passwords.db')
+            cur = conn.cursor()
+            res = cur.execute(f'SELECT password FROM passwords WHERE hash = "{hashlib.sha3_256(hashe.split(":")[1].encode()).hexdigest()}"')
+            res = res.fetchall()
+            if len(res):
+                cur.close()
+                conn.close()
+                return res[0][0]
+
     # Вторая команда: ./john --wordlist=passlist.txt 4.hashes
     command2 = ["./john/run/john", f"--wordlist={passlist}",
                 f'static/hashes/{os.path.splitext(archive_path)[0].split('/')[-1]}.hashes']
@@ -55,8 +79,19 @@ def zip(archive_path, passlist='passlist.txt'):
     with open(f'static/hashes/{os.path.splitext(archive_path)[0].split('/')[-1]}.hashes', "w") as f:
         subprocess.run(command1, stdout=f)
     with open(f'static/hashes/{os.path.splitext(archive_path)[0].split('/')[-1]}.hashes', "r") as f:
-        if len(f.read()) < 10:
+        hashe = f.read()
+        if len(hashe) < 10:
             return 'No hash'
+        else:
+            conn = sqlite3.connect('./static/passwords.db')
+            cur = conn.cursor()
+            res = cur.execute(f'SELECT password FROM passwords WHERE hash = "{hashlib.sha3_256(hashe.split(":")[1].encode()).hexdigest()}"')
+            res = res.fetchall()
+            if len(res):
+                cur.close()
+                conn.close()
+                return res[0][0]
+
     # Вторая команда: ./john --wordlist=passlist.txt 4.hashes
     command2 = ["./john/run/john", f"--wordlist={passlist}",
                 f'static/hashes/{os.path.splitext(archive_path)[0].split('/')[-1]}.hashes']

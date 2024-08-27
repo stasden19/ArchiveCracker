@@ -8,6 +8,8 @@ from john_cmd import zip, zip7, rar
 import asyncio
 import threading
 import secrets
+import sqlite3
+import hashlib
 
 app = Flask(__name__)
 resulted = None
@@ -26,11 +28,27 @@ def result(filename1):
         elif os.path.splitext(filename1)[-1] == '.rar':
             resulted = rar(f'./static/files/{filename}', passlist='passlist.txt')
         try:
-            resulted = re.findall(r'\n(.*?) \n', resulted)[0] if resulted else 'Не тот формат файла'
-        except:
+            try:
+                resulted = re.findall(r'\n(.*?) \n', resulted)[0]
+                resulted = ' '.join(resulted.split()[:-1])
+            except:
+                resulted = 'Pass not found'
+            print(resulted)
+            with open(f'./static/hashes/{filename.split(".")[0]}.hashes', 'r') as file:
+                conn = sqlite3.connect('./static/passwords.db')
+                cur = conn.cursor()
+                hashe = file.read()
+                hashe = hashlib.sha3_256(hashe.split(":")[1].encode()).hexdigest()
+                cur.execute(
+                    f'INSERT OR IGNORE INTO passwords VALUES ("{hashe}", "{resulted}")')
+                conn.commit()
+                cur.close()
+                conn.close()
+        except Exception as e:
+            print(e)
             resulted = 'Пароль не найден.'
         # resulted = re.findall(r'\n(.*?) \n', resulted)if resulted else 'Не тот формат файла'
-        print(resulted)
+
         os.system(f'rm ./static/files/{filename}')
         os.system(f'rm ./static/hashes/{filename.split(".")[0]}.hashes')
         # записываем результат в файл
@@ -65,11 +83,7 @@ def upload_chunk():
     file = request.files["file"]
     file_uuid = request.form["dzuuid"]
     # Generate a unique filename to avoid overwriting using 8 chars of uuid before filename.
-    filename = f"{file_uuid[:8]}"
-    try:
-        int(filename, 16)
-    except:
-        return render_template('index.html')
+    filename = f"{hashlib.sha3_256(file_uuid[:8].encode()).hexdigest()}"
 
     save_path = Path("static", "files", filename + os.path.splitext(file.filename)[-1])
     # if
@@ -91,8 +105,7 @@ def upload_chunk():
         if os.path.getsize(save_path) != int(request.form["dztotalfilesize"]):
             print(os.path.getsize(save_path), int(request.form["dztotalfilesize"]))
             return "Size mismatch.", 500
-        # jsonify({'redirect': url_for('result')}), 200
-        return jsonify({'redirect': f"/result/{file_uuid[:8]}{os.path.splitext(file.filename)[-1]}"}), 200
+        return jsonify({'redirect': f"/result/{filename}{os.path.splitext(file.filename)[-1]}"}), 200
     return 'Success', 200
     # print(request.form)
 
