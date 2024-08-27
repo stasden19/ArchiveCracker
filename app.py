@@ -32,7 +32,7 @@ def result(filename1):
                 resulted = re.findall(r'\n(.*?) \n', resulted)[0]
                 resulted = ' '.join(resulted.split()[:-1])
             except:
-                resulted = 'Pass not found'
+                pass
             print(resulted)
             with open(f'./static/hashes/{filename.split(".")[0]}.hashes', 'r') as file:
                 conn = sqlite3.connect('./static/passwords.db')
@@ -45,7 +45,7 @@ def result(filename1):
                 cur.close()
                 conn.close()
         except Exception as e:
-            print(e)
+            print('ERROR:', e)
             resulted = 'Пароль не найден.'
         # resulted = re.findall(r'\n(.*?) \n', resulted)if resulted else 'Не тот формат файла'
 
