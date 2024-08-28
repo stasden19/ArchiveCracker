@@ -19,7 +19,6 @@
                 url: '/task_status',
                 success: function(data) {
                     if (data.status === "running") {
-                        console.log('Прогон')
                         $('#status').html('Задача выполняется...');
                         setTimeout(checkStatus, 5000);
                     } else {
@@ -31,7 +30,7 @@
         checkStatus()
     </script>
     <form action="/">
-   <button>На главную</button>
-  </form>
+        <button>На главную</button>
+    </form>
 </body>
 </html>
