@@ -27,18 +27,14 @@ def result(filename1):
             resulted = zip7(f'./static/files/{filename}', passlist='passlist.txt')
         elif os.path.splitext(filename1)[-1] == '.rar':
             resulted = rar(f'./static/files/{filename}', passlist='passlist.txt')
+        # print(resulted)
         try:
-            try:
-                resulted = re.findall(r'\n(.*?) \n', resulted)[0]
-                resulted = ' '.join(resulted.split()[:-1])
-            except:
-                pass
-            print(resulted)
             with open(f'./static/hashes/{filename.split(".")[0]}.hashes', 'r') as file:
                 conn = sqlite3.connect('./static/passwords.db')
                 cur = conn.cursor()
                 hashe = file.read()
                 hashe = hashlib.sha3_256(hashe.split(":")[1].encode()).hexdigest()
+                resulted = f'<br>{resulted.split('\n')[-2].split()[0]}'
                 cur.execute(
                     f'INSERT OR IGNORE INTO passwords VALUES ("{hashe}", "{resulted}")')
                 conn.commit()
@@ -46,14 +42,14 @@ def result(filename1):
                 conn.close()
         except Exception as e:
             print('ERROR:', e)
-            resulted = 'Пароль не найден.'
+            # resulted = 'Пароль не найден.'
         # resulted = re.findall(r'\n(.*?) \n', resulted)if resulted else 'Не тот формат файла'
 
         os.system(f'rm ./static/files/{filename}')
         os.system(f'rm ./static/hashes/{filename.split(".")[0]}.hashes')
         # записываем результат в файл
 
-        # создаем отдельный поток для выполнения функции zip
+        # создаем отдельный поток для выполнения функц  ии zip
 
     thread = threading.Thread(target=zip_file, args=(filename1,))
     thread.start()
